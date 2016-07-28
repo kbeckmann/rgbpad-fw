@@ -1,0 +1,87 @@
+--------------------------------------------------------------------------------
+nrfjprog --log -e
+nrfjprog verion 8.2.0
+--------------------------------------------------------------------------------
+FUNCTION: open_dll.
+FUNCTION: open_dll.
+FUNCTION: dll_version.
+FUNCTION: enum_emu_snr.
+FUNCTION: enum_emu_snr.
+FUNCTION: enum_emu_snr.
+FUNCTION: enum_emu_snr.
+FUNCTION: connect_to_emu_with_snr.
+FUNCTION: connect_to_emu_with_snr.
+FUNCTION: connect_to_emu_without_snr.
+FUNCTION: enum_emu_snr.
+Device "NRF52832_XXAA" selected.
+FUNCTION: read_device_version.
+FUNCTION: read_device_version.
+Found SWD-DP with ID 0x0BB11477
+Found Cortex-M0 r0p0, Little endian.
+FPUnit: 4 code (BP) slots and 0 literal slots
+CoreSight components:
+ROMTbl 0 @ E00FF000
+ROMTbl 0 [0]: FFF0F000, CID: B105E00D, PID: 000BB008 SCS
+ROMTbl 0 [1]: FFF02000, CID: B105E00D, PID: 000BB00A DWT
+ROMTbl 0 [2]: FFF03000, CID: B105E00D, PID: 000BB00B FPB
+JLinkARM.dll ReadMemU32 returned error -1.
+FUNCTION: close_dll.
+FUNCTION: close_dll.
+--------------------------------------------------------------------------------
+nrfjprog --log -e
+nrfjprog verion 8.2.0
+--------------------------------------------------------------------------------
+FUNCTION: open_dll.
+FUNCTION: open_dll.
+FUNCTION: dll_version.
+FUNCTION: enum_emu_snr.
+FUNCTION: enum_emu_snr.
+FUNCTION: enum_emu_snr.
+FUNCTION: enum_emu_snr.
+FUNCTION: connect_to_emu_with_snr.
+FUNCTION: connect_to_emu_with_snr.
+FUNCTION: connect_to_emu_without_snr.
+FUNCTION: enum_emu_snr.
+Device "NRF52832_XXAA" selected.
+FUNCTION: read_device_version.
+FUNCTION: read_device_version.
+Found SWD-DP with ID 0x0BB11477
+Found Cortex-M0 r0p0, Little endian.
+FPUnit: 4 code (BP) slots and 0 literal slots
+CoreSight components:
+ROMTbl 0 @ E00FF000
+ROMTbl 0 [0]: FFF0F000, CID: B105E00D, PID: 000BB008 SCS
+ROMTbl 0 [1]: FFF02000, CID: B105E00D, PID: 000BB00A DWT
+ROMTbl 0 [2]: FFF03000, CID: B105E00D, PID: 000BB00B FPB
+JLinkARM.dll ReadMemU32 returned error -1.
+FUNCTION: close_dll.
+FUNCTION: close_dll.
+--------------------------------------------------------------------------------
+nrfjprog -e --log
+nrfjprog verion 8.2.0
+--------------------------------------------------------------------------------
+FUNCTION: open_dll.
+FUNCTION: open_dll.
+FUNCTION: dll_version.
+FUNCTION: enum_emu_snr.
+FUNCTION: enum_emu_snr.
+FUNCTION: enum_emu_snr.
+FUNCTION: enum_emu_snr.
+FUNCTION: connect_to_emu_with_snr.
+FUNCTION: connect_to_emu_with_snr.
+FUNCTION: connect_to_emu_without_snr.
+FUNCTION: enum_emu_snr.
+Device "NRF52832_XXAA" selected.
+FUNCTION: read_device_version.
+FUNCTION: read_device_version.
+Found SWD-DP with ID 0x0BB11477
+Found Cortex-M0 r0p0, Little endian.
+FPUnit: 4 code (BP) slots and 0 literal slots
+CoreSight components:
+ROMTbl 0 @ E00FF000
+ROMTbl 0 [0]: FFF0F000, CID: B105E00D, PID: 000BB008 SCS
+ROMTbl 0 [1]: FFF02000, CID: B105E00D, PID: 000BB00A DWT
+ROMTbl 0 [2]: FFF03000, CID: B105E00D, PID: 000BB00B FPB
+JLinkARM.dll ReadMemU32 returned error -1.
+FUNCTION: close_dll.
+FUNCTION: close_dll.
