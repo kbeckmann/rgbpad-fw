@@ -60,15 +60,17 @@ static void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN 0 */
 
-/* USER CODE END 0 */
-
-uint8_t fulsin(uint32_t x, uint8_t max) {
-  if (x % (max*2+2) > max) {
-    return max - x;
+uint32_t fulsin(uint32_t x, uint32_t max) {
+  uint32_t y = x % (max*2 - 2);
+  if (y >= max) {
+    return 2 * max - 2 - y;
   } else {
-    return x;
+    return y;
   }
 }
+
+/* USER CODE END 0 */
+
 int main(void)
 {
 
@@ -94,20 +96,24 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
   uint8_t rgb[4 * 16];
-  int t = 30;
-    HAL_Delay(500);
+  uint32_t t = 0;
+  HAL_Delay(500);
   while (1)
   {
 
-  if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == 0)
+  if (1 || HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == 0)
   {
     t++;
+    uint32_t sint = fulsin(t, 32);
+    uint8_t high = sint*sint/4;
+    uint8_t low = high / 2;
     for(int i = 0; i < sizeof(rgb) / 4; i++) {
-      rgb[4*i + 0] = fulsin(t, 31);
-      rgb[4*i + 1] = i%4 == 0 ? 255 : 0;
-      rgb[4*i + 2] = i%4 == 1 ? 255 : i%4 == 3 ? 127 : 0;
-      rgb[4*i + 3] = i%4 == 2 ? 255 : i%4 == 3 ? 127 : 0;
+      rgb[4*i + 0] = 31;
+      rgb[4*i + 1] = i%4 == 0 ? high : 0;
+      rgb[4*i + 2] = i%4 == 1 ? high : i%4 == 3 ? low : 0;
+      rgb[4*i + 3] = i%4 == 2 ? high : i%4 == 3 ? low : 0;
     }
   }
   else {
@@ -124,9 +130,9 @@ int main(void)
                        GPIOA, GPIO_PIN_8,
                        rgb, sizeof(rgb) / 4);
 
-    HAL_Delay(10);
-
+    HAL_Delay(50);
   }
+
   /* USER CODE END 3 */
 
 }
@@ -143,7 +149,10 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = 16;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL12;
+  RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -151,10 +160,10 @@ void SystemClock_Config(void)
 
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -236,6 +245,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : PA12 */
+  GPIO_InitStruct.Pin = GPIO_PIN_12;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
   /*Configure GPIO pin : PB5 */
   GPIO_InitStruct.Pin = GPIO_PIN_5;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -246,7 +261,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pins : PB8 PB9 */
   GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   GPIO_InitStruct.Alternate = GPIO_AF1_I2C1;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
