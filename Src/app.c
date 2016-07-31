@@ -1,6 +1,7 @@
 #include "stm32f0xx_hal.h"
 
 #include "apa102.h"
+#include "board.h"
 
 uint32_t fulsin(uint32_t x, uint32_t max) {
     uint32_t y = x % (max*2 - 2);
@@ -22,18 +23,21 @@ DigitalIn pins[16] =
 };
 */
 
-void run_app() {
-    uint8_t rgb[4 * 16];
+uint8_t rgb[4 * 16];
+void app_run() {
     uint32_t t = 0;
+
+    uart_printf("RGBPAD ready to do awesome stuff!\r\n");
+
     HAL_Delay(500);
     while (1) {
-        if (1 || HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == 0) {
+        if ( HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == 0) {
             t++;
-            uint32_t sint = fulsin(t, 32);
+            uint32_t sint = 31;//fulsin(t, 32);
             uint8_t high = sint*sint/4;
             uint8_t low = high / 2;
             for(int i = 0; i < sizeof(rgb) / 4; i++) {
-                rgb[4*i + 0] = 31;
+                rgb[4*i + 0] = 3;
                 rgb[4*i + 1] = i%4 == 0 ? high : 0;
                 rgb[4*i + 2] = i%4 == 1 ? high : i%4 == 3 ? low : 0;
                 rgb[4*i + 3] = i%4 == 2 ? high : i%4 == 3 ? low : 0;
@@ -41,18 +45,18 @@ void run_app() {
         }
         else {
             for(int i = 0; i < sizeof(rgb) / 4; i++) {
-                rgb[4*i + 0] = 0;
-                rgb[4*i + 1] = 0;
-                rgb[4*i + 2] = 0;
-                rgb[4*i + 3] = 0;
+                rgb[4*i + 0] = 3;
+                rgb[4*i + 1] = 255;
+                rgb[4*i + 2] = 255;
+                rgb[4*i + 3] = 255;
             }
             t = 0;
         }
 
         apa102_send_buffer(GPIOA, GPIO_PIN_9,
-        GPIOA, GPIO_PIN_8,
-        rgb, sizeof(rgb) / 4);
+                           GPIOA, GPIO_PIN_8,
+                           (uint32_t*)rgb, sizeof(rgb) / 4);
 
-        HAL_Delay(25);
+        HAL_Delay(20);
     }
 }

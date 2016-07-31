@@ -13,7 +13,7 @@ TARGET = rgbpad
 # debug build?
 DEBUG = 1
 # optimization
-OPT = -O0
+OPT = -Os
 
 #######################################
 # pathes
@@ -29,7 +29,7 @@ C_SOURCES = \
   Src/stm32f0xx_hal_msp.c \
   Src/apa102.c \
   Src/app.c \
-  Src/main.c \
+  Src/board.c \
   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c \
   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c \
   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c \
@@ -126,7 +126,7 @@ $(BUILD_DIR):
 	mkdir -p $@
 
 deploy: $(BUILD_DIR)/$(TARGET).hex
-	openocd -f interface/stlink-v2-1.cfg -f target/stm32f0x_stlink.cfg -c "program $(BUILD_DIR)/$(TARGET).hex 0 verify" -c "reset run" -c "exit"
+	openocd -f interface/stlink-v2-1.cfg -f target/stm32f0x.cfg -c "program $(BUILD_DIR)/$(TARGET).hex 0 verify" -c "reset run" -c "exit"
 
 #######################################
 # clean up

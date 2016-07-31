@@ -2,7 +2,7 @@
 #define _APP_H
 
 
-void run_app();
+void app_run();
 
 
 #endif // _APP_H
