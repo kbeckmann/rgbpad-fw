@@ -1,0 +1,58 @@
+#include "stm32f0xx_hal.h"
+
+#include "apa102.h"
+
+uint32_t fulsin(uint32_t x, uint32_t max) {
+    uint32_t y = x % (max*2 - 2);
+    if (y >= max) {
+        return 2 * max - 2 - y;
+    } else {
+        return y;
+    }
+}
+
+/*
+#define FOO(GPIOx, GPIO_Pin) (GPIOx->IDR & GPIO_Pin)
+DigitalIn pins[16] =
+{
+    DigitalIn(PA_0, PullUp),  DigitalIn(PA_1, PullUp),  DigitalIn(PA_2, PullUp),  DigitalIn(PA_3, PullUp),
+    DigitalIn(PA_7, PullUp),  DigitalIn(PA_6, PullUp),  DigitalIn(PA_5, PullUp),  DigitalIn(PA_4, PullUp),
+    DigitalIn(PB_0, PullUp),  DigitalIn(PB_1, PullUp),  DigitalIn(PB_10, PullUp), DigitalIn(PB_11, PullUp),
+    DigitalIn(PB_15, PullUp), DigitalIn(PB_14, PullUp), DigitalIn(PB_13, PullUp), DigitalIn(PB_12, PullUp)
+};
+*/
+
+void run_app() {
+    uint8_t rgb[4 * 16];
+    uint32_t t = 0;
+    HAL_Delay(500);
+    while (1) {
+        if (1 || HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == 0) {
+            t++;
+            uint32_t sint = fulsin(t, 32);
+            uint8_t high = sint*sint/4;
+            uint8_t low = high / 2;
+            for(int i = 0; i < sizeof(rgb) / 4; i++) {
+                rgb[4*i + 0] = 31;
+                rgb[4*i + 1] = i%4 == 0 ? high : 0;
+                rgb[4*i + 2] = i%4 == 1 ? high : i%4 == 3 ? low : 0;
+                rgb[4*i + 3] = i%4 == 2 ? high : i%4 == 3 ? low : 0;
+            }
+        }
+        else {
+            for(int i = 0; i < sizeof(rgb) / 4; i++) {
+                rgb[4*i + 0] = 0;
+                rgb[4*i + 1] = 0;
+                rgb[4*i + 2] = 0;
+                rgb[4*i + 3] = 0;
+            }
+            t = 0;
+        }
+
+        apa102_send_buffer(GPIOA, GPIO_PIN_9,
+        GPIOA, GPIO_PIN_8,
+        rgb, sizeof(rgb) / 4);
+
+        HAL_Delay(25);
+    }
+}

@@ -28,6 +28,7 @@ C_SOURCES = \
   Src/stm32f0xx_it.c \
   Src/stm32f0xx_hal_msp.c \
   Src/apa102.c \
+  Src/app.c \
   Src/main.c \
   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c \
   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c \
@@ -124,6 +125,9 @@ $(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
 $(BUILD_DIR):
 	mkdir -p $@
 
+deploy: $(BUILD_DIR)/$(TARGET).hex
+	openocd -f interface/stlink-v2-1.cfg -f target/stm32f0x_stlink.cfg -c "program $(BUILD_DIR)/$(TARGET).hex 0 verify" -c "reset run" -c "exit"
+
 #######################################
 # clean up
 #######################################
@@ -135,6 +139,6 @@ clean:
 #######################################
 -include $(shell mkdir .dep 2>/dev/null) $(wildcard .dep/*)
 
-.PHONY: clean all
+.PHONY: clean all deploy
 
 # *** EOF ***
