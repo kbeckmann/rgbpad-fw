@@ -5,6 +5,7 @@
 #define ENABLE_UART_PRINTF 1
 
 extern UART_HandleTypeDef huart1;
+extern I2C_HandleTypeDef hi2c1;
 
 #if ENABLE_UART && ENABLE_UART_PRINTF
     void uart_printf(const char* format, ...);

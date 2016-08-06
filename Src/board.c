@@ -4,6 +4,7 @@
 #include <stdarg.h>     /* va_list, va_start, va_end */
 
 UART_HandleTypeDef huart1;
+I2C_HandleTypeDef hi2c1;
 
 extern void app_run();
 
@@ -23,12 +24,10 @@ void uart_printf(const char* format, ...) {
   */
 void Error_Handler(void)
 {
-  /* USER CODE BEGIN Error_Handler */
-  /* User can add his own implementation to report the HAL error return state */
-  while(1)
-  {
-  }
-  /* USER CODE END Error_Handler */
+    /* User can add his own implementation to report the HAL error return state */
+    uart_printf("Error_Handler. Not good.\r\n");
+    while(1) {
+    }
 }
 
 #ifdef USE_FULL_ASSERT
@@ -42,10 +41,7 @@ void Error_Handler(void)
    */
 void assert_failed(uint8_t* file, uint32_t line)
 {
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-    ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
+    uart_printf("Wrong parameters value: file %s on line %d\r\n", file, line);
 }
 
 #endif
@@ -128,7 +124,7 @@ static void MX_GPIO_Init(void)
     GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW; //GPIO_SPEED_FREQ_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF1_I2C1;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
@@ -137,6 +133,77 @@ static void MX_GPIO_Init(void)
 
     /*Configure GPIO pin Output Level */
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
+}
+
+
+/**
+  * @brief Initialize the I2C MSP.
+  * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
+  *                the configuration information for the specified I2C.
+  * @retval None
+  */
+ __weak void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
+{
+    /* Prevent unused argument(s) compilation warning */
+    UNUSED(hi2c);
+    uart_printf("HAL_I2C_MspInit..\r\n");
+    __HAL_RCC_I2C1_CLK_ENABLE();
+}
+
+/**
+  * @brief DeInitialize the I2C MSP.
+  * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
+  *                the configuration information for the specified I2C.
+  * @retval None
+  */
+ __weak void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c)
+{
+    /* Prevent unused argument(s) compilation warning */
+    UNUSED(hi2c);
+
+    uart_printf("HAL_I2C_MspDeInit..\r\n");
+}
+
+/* I2C1 init function */
+static void MX_I2C1_Init(void)
+{
+
+    hi2c1.Instance = I2C1;
+//    hi2c1.Init.Timing = 0x2000090E;
+
+    hi2c1.Init.Timing =
+        (1 << I2C_TIMINGR_PRESC_Pos)    |
+        (0x13 << I2C_TIMINGR_SCLL_Pos)  |
+        (0x0F << I2C_TIMINGR_SCLH_Pos)  |
+        (0x2 << I2C_TIMINGR_SDADEL_Pos) |
+        (0x4 << I2C_TIMINGR_SCLDEL_Pos) ;
+
+
+    hi2c1.Init.OwnAddress1 = 0x12 << 1;
+    hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+    hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+    hi2c1.Init.OwnAddress2 = 0;
+    hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+    hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLED;
+    hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+    if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+    {
+        Error_Handler();
+    }
+
+    /**Configure Analogue filter
+    */
+    if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+    {
+        Error_Handler();
+    }
+
+
+    uart_printf("i2c init..\r\n");
+
+    HAL_I2C_Init(&hi2c1);
+
+    uart_printf("i2c init done..\r\n");
 }
 
 /** System Clock Configuration
@@ -171,6 +238,7 @@ void SystemClock_Config(void)
 
     PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1;
     PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK1;
+    PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_HSI;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
     {
         Error_Handler();
@@ -196,7 +264,13 @@ void board_init() {
 
 #if ENABLE_UART
     MX_USART1_UART_Init();
+    uart_printf("\r\n\r\nUART online!\r\n");
 #endif
+
+    MX_I2C1_Init();
+
+    uart_printf("board_init done\r\n");
+
 }
 
 int main() {
