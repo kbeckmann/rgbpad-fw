@@ -4,6 +4,9 @@
 #define ENABLE_UART 1
 #define ENABLE_UART_PRINTF 1
 
+#define I2C_SLAVE_ADDR 0x12
+
+extern ADC_HandleTypeDef hadc;
 extern UART_HandleTypeDef huart1;
 extern I2C_HandleTypeDef hi2c1;
 

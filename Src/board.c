@@ -3,6 +3,7 @@
 #include <stdio.h>      /* vsprintf */
 #include <stdarg.h>     /* va_list, va_start, va_end */
 
+ADC_HandleTypeDef hadc;
 UART_HandleTypeDef huart1;
 I2C_HandleTypeDef hi2c1;
 
@@ -135,6 +136,43 @@ static void MX_GPIO_Init(void)
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
 }
 
+/* ADC init function */
+static void MX_ADC_Init(void)
+{
+
+  ADC_ChannelConfTypeDef sConfig;
+
+    /**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
+    */
+  hadc.Instance = ADC1;
+  hadc.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV1;
+  hadc.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc.Init.ScanConvMode = ADC_SCAN_DIRECTION_FORWARD;
+  hadc.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  hadc.Init.LowPowerAutoWait = DISABLE;
+  hadc.Init.LowPowerAutoPowerOff = DISABLE;
+  hadc.Init.ContinuousConvMode = DISABLE;
+  hadc.Init.DiscontinuousConvMode = DISABLE;
+  hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc.Init.DMAContinuousRequests = DISABLE;
+  hadc.Init.Overrun = ADC_OVR_DATA_PRESERVED;
+  if (HAL_ADC_Init(&hadc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+    /**Configure for the selected ADC regular channel to be converted.
+    */
+  sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
+  sConfig.Rank = ADC_RANK_CHANNEL_NUMBER;
+  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+}
 
 /**
   * @brief Initialize the I2C MSP.
@@ -179,7 +217,7 @@ static void MX_I2C1_Init(void)
         (0x4 << I2C_TIMINGR_SCLDEL_Pos) ;
 
 
-    hi2c1.Init.OwnAddress1 = 0x12 << 1;
+    hi2c1.Init.OwnAddress1 = I2C_SLAVE_ADDR << 1;
     hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
     hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
     hi2c1.Init.OwnAddress2 = 0;
@@ -266,6 +304,8 @@ void board_init() {
     MX_USART1_UART_Init();
     uart_printf("\r\n\r\nUART online!\r\n");
 #endif
+
+    MX_ADC_Init();
 
     MX_I2C1_Init();
 
