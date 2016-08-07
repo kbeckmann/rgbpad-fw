@@ -50,7 +50,7 @@ C_SOURCES = \
   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c \
   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash.c \
   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash_ex.c \
-  Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates/system_stm32f0xx.c  
+  Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates/system_stm32f0xx.c
 ASM_SOURCES = \
   Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates/gcc/startup_stm32f030x8.s
 
@@ -64,7 +64,7 @@ AR = arm-none-eabi-ar
 SZ = arm-none-eabi-size
 HEX = $(CP) -O ihex
 BIN = $(CP) -O binary -S
- 
+
 #######################################
 # CFLAGS
 #######################################
@@ -110,7 +110,7 @@ vpath %.c $(sort $(dir $(C_SOURCES)))
 OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SOURCES:.s=.o)))
 vpath %.s $(sort $(dir $(ASM_SOURCES)))
 
-$(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR) 
+$(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
 	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
 
 $(BUILD_DIR)/%.o: %.s Makefile | $(BUILD_DIR)
@@ -122,12 +122,12 @@ $(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) Makefile
 
 $(BUILD_DIR)/%.hex: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
 	$(HEX) $< $@
-	
+
 $(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
-	$(BIN) $< $@	
-	
+	$(BIN) $< $@
+
 $(BUILD_DIR):
-	mkdir -p $@		
+	mkdir -p $@
 
 deploy: $(BUILD_DIR)/$(TARGET).hex
 	openocd -f interface/stlink-v2-1.cfg -f target/stm32f0x.cfg -c "program $(BUILD_DIR)/$(TARGET).hex 0 verify" -c "reset run" -c "exit"
@@ -137,7 +137,7 @@ deploy: $(BUILD_DIR)/$(TARGET).hex
 #######################################
 clean:
 	-rm -fR .dep $(BUILD_DIR)
-  
+
 #######################################
 # dependencies
 #######################################
