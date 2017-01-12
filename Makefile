@@ -130,7 +130,7 @@ $(BUILD_DIR):
 	mkdir -p $@
 
 deploy: $(BUILD_DIR)/$(TARGET).hex
-	openocd -f interface/stlink-v2-1.cfg -f target/stm32f0x.cfg -c "program $(BUILD_DIR)/$(TARGET).hex 0 verify" -c "reset run" -c "exit"
+	openocd -f interface/stlink-v2.cfg -f target/stm32f0x.cfg -c "program $(BUILD_DIR)/$(TARGET).hex 0 verify" -c "reset run" -c "exit"
 
 #######################################
 # clean up

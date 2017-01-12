@@ -8,36 +8,94 @@
 
 uint32_t g_framebuffer[16];
 
+static void hsvtorgb(unsigned char *r, unsigned char *g, unsigned char *b, unsigned char h, unsigned char s, unsigned char v)
+{
+  unsigned char region, fpart, p, q, t;
+
+  if(s == 0) {
+    /* color is grayscale */
+    *r = *g = *b = v;
+    return;
+  }
+
+  /* make hue 0-5 */
+  region = h / 43;
+  /* find remainder part, make it from 0-255 */
+  fpart = (h - (region * 43)) * 6;
+
+  /* calculate temp vars, doing integer multiplication */
+  p = (v * (255 - s)) >> 8;
+  q = (v * (255 - ((s * fpart) >> 8))) >> 8;
+  t = (v * (255 - ((s * (255 - fpart)) >> 8))) >> 8;
+
+  /* assign temp vars based on color cone region */
+  switch(region) {
+    case 0:
+      *r = v; *g = t; *b = p; break;
+    case 1:
+      *r = q; *g = v; *b = p; break;
+    case 2:
+      *r = p; *g = v; *b = t; break;
+    case 3:
+      *r = p; *g = q; *b = v; break;
+    case 4:
+      *r = t; *g = p; *b = v; break;
+    default:
+      *r = v; *g = p; *b = q; break;
+  }
+
+  return;
+}
+
+
 #if RGBTEST
 static void rgb_test() {
     uint32_t t = 0;
     uint8_t rgb[16*4];
-    uint8_t brightness = 255;
+    uint8_t brightness = 1;
+    float val = 0, sval = 0, q = 0;
 
     while (1) {
         t++;
         read_buttons();
-        uart_printf(".");
+
+
+
+
+        int x;
+        HAL_ADC_Start(&hadc);
+        HAL_ADC_PollForConversion(&hadc, 1000);
+        x = HAL_ADC_GetValue(&hadc);
+        HAL_ADC_Stop(&hadc);
+
+
+        sval = x*0.01 + sval*0.99;
+        val = x*0.03 + val*0.97;
+        float m = val > sval?val-sval:sval-val;
+        q = (m) * 0.02 + q*0.98;
+        brightness = (uint8_t) (q<0?0:q>255?255:q);
+
+        t++;
+
+
+
+        uint8_t r, g, b;
+        hsvtorgb(&r, &g, &b, brightness + (t>>4), 255, 255);
+
+
+        uart_printf("%d\r\n", brightness);
         for(uint8_t i = 0; i < BUTTONS_COUNT; i++) {
-            if (!g_buttons[i]) {
-                rgb[4*i + 0] = 31;
-                rgb[4*i + 1] = (t % 3) == 0 ? brightness : 0;
-                rgb[4*i + 2] = (t % 3) == 1 ? brightness : 0;
-                rgb[4*i + 3] = (t % 3) == 2 ? brightness : 0;
-            }
-            else {
-                rgb[4*i + 0] = 31;
-                rgb[4*i + 1] = 0;
-                rgb[4*i + 2] = 0;
-                rgb[4*i + 3] = 0;
-            }
+            rgb[4*i + 0] = 31;
+            rgb[4*i + 1] = r;
+            rgb[4*i + 2] = g;
+            rgb[4*i + 3] = b;
         }
 
         apa102_send_buffer(GPIOA, GPIO_PIN_9,
                            GPIOA, GPIO_PIN_8,
                            (uint32_t*)rgb, sizeof(rgb) / 4);
 
-        HAL_Delay(400);
+//        HAL_Delay(250);
     }
 }
 #endif
